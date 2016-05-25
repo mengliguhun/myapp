@@ -1,5 +1,5 @@
 var express = require('express');
-var db = require('./db');
+var db = require('../db');
 var router = express.Router();
 var users;
 /* GET users listing. */
@@ -7,8 +7,14 @@ router.get('/users', function(req, res, next) {
   db.bind('users');
   db.users.find().toArray(function(err, items) {
     users = items;
-    res.render('users', { title: 'Users', users: items });
     db.close();
+    if (items){
+      res.render('users', { title: 'Users', users: items });
+    }
+   else {
+      res.send("cannot find users")
+    }
+
   });
 });
 router.all('/user/:id/:op?', function(req, res, next){

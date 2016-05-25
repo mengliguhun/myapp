@@ -1,0 +1,22 @@
+extends ../layout
+
+block content
+  h1 注册
+  #err
+    if(err)
+      p(class="msg error") #{err}
+  #success
+    if(success)
+      p(class="msg success") !{success}
+  form(method="post" action="/register")
+    p
+      label 用 户 名:
+      input(type="text" name="username")
+    p
+      label 密    码:
+      input(type="text" name="password")
+    p
+      label 确认密码:
+      input(type="text" name="password1")
+    p
+      input(type="submit" name="注册")
