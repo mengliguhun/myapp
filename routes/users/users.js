@@ -1,22 +1,31 @@
 var express = require('express');
-var db = require('../db');
+var dbPool = require('../db');
 var router = express.Router();
 var users;
 /* GET users listing. */
 router.get('/users', function(req, res, next) {
-  db.bind('users');
-  db.users.find().toArray(function(err, items) {
-    users = items;
-    db.close();
-    if (items){
-      res.render('users', { title: 'Users', users: items });
+  dbPool.acquire(function(err, db) {
+    if (err) {
+      res.send(err)
     }
-   else {
-      res.send("cannot find users")
-    }
+    else {
+      db.bind('users');
+      db.users.find().toArray(function(err, items) {
+        dbPool.release(db);
+        users = items;
+        if (items){
+          res.render('users', { title: 'Users', users: items });
+        }
+        else {
+          res.send("cannot find users")
+        }
 
+      });
+    }
   });
+
 });
+
 router.all('/user/:id/:op?', function(req, res, next){
   var id = req.params.id;
   req.user = users[id];
