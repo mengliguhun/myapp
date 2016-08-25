@@ -6,7 +6,7 @@ var users;
 // Session-persisted message middleware
 router.use(function (req, res, next) {
 
-  if(req.session.success){
+  if(req.session.user){
     next();
   }
   else {

@@ -9,8 +9,18 @@ module.exports = router;
 
 // Session-persisted message middleware
 router.use(function (req, res, next) {
+    var msg;
     var err = req.session.error;
-    var msg = req.session.success;
+
+    delete req.session.error;
+
+    if (req.session.success == 0){
+        msg = '登录成功.'
+    }
+    if (req.session.success == 1){
+        msg = '注册成功.'
+        req.session.success = 0;
+    }
 
     res.locals.err = '';
     res.locals.success = '';
@@ -48,7 +58,7 @@ router.post('/register', function (req, res) {
                 // in the session store to be retrieved,
                 // or in this case the entire user object
                 req.session.user = user;
-                req.session.success = '注册成功';
+                req.session.success = 1;
                 res.redirect('/');
             });
         } else {
@@ -71,7 +81,7 @@ router.post('/login', function (req, res) {
                 // in the session store to be retrieved,
                 // or in this case the entire user object
                 req.session.user = user;
-                req.session.success = '登录成功.';
+                req.session.success = 0;
                 res.redirect('back');
             });
         } else {
