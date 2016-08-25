@@ -2,6 +2,18 @@ var express = require('express');
 var dbPool = require('../db');
 var router = express.Router();
 var users;
+
+// Session-persisted message middleware
+router.use(function (req, res, next) {
+
+  if(req.session.success){
+    next();
+  }
+  else {
+    res.redirect('/login');
+  }
+
+});
 /* GET users listing. */
 router.get('/users', function(req, res, next) {
   dbPool.acquire(function(err, db) {
@@ -40,13 +52,15 @@ router.all('/user/:id/:op?', function(req, res, next){
 router.get('/user/:id', function(req, res){
   res.render('users/view', {
     title: 'Viewing user ' + req.user.name,
-    user: req.user
+    user: req.user,
+    id:req.params.id
   });
 });
 router.get('/user/:id/view', function(req, res){
   res.render('users/view', {
     title: 'Viewing user ' + req.user.name,
-    user: req.user
+    user: req.user,
+    id:req.params.id
   });
 });
 router.get('/user/:id/edit', function(req, res){

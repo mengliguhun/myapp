@@ -3,27 +3,20 @@
  */
 var express = require('express');
 var hashc = require('./pass').hash;
-var session = require('express-session');
 var router = express.Router();
 var dbPool = require('../db');
 module.exports = router;
 
-// middleware
-router.use(session({
-    resave: false, // don't save session if unmodified
-    saveUninitialized: false, // don't create session until something stored
-    secret: 'shhhh, very secret'
-}));
 // Session-persisted message middleware
 router.use(function (req, res, next) {
     var err = req.session.error;
     var msg = req.session.success;
-    delete req.session.error;
-    delete req.session.success;
+
     res.locals.err = '';
     res.locals.success = '';
     if (err) res.locals.err = err ;
     if (msg) res.locals.success =  msg ;
+
     next();
 });
 
@@ -46,7 +39,7 @@ router.get('/register', function (req, res) {
     res.render('auth/register');
 });
 router.post('/register', function (req, res) {
-    register(req.body.username, req.body.password,req.body.password1,function (err, user) {
+    register(req.body.username, req.body.password,req.body.passwordtwo,function (err, user) {
         if (user) {
             // Regenerate session when signing in
             // to prevent fixation
@@ -55,9 +48,8 @@ router.post('/register', function (req, res) {
                 // in the session store to be retrieved,
                 // or in this case the entire user object
                 req.session.user = user;
-                req.session.success = '用户<a href="/logout">注销</a>. '
-                    + ' 你能够<a href="/restricted">跳往注销界面</a>.';
-                res.redirect('back');
+                req.session.success = '注册成功';
+                res.redirect('/');
             });
         } else {
             req.session.error = err.toString();
@@ -79,8 +71,7 @@ router.post('/login', function (req, res) {
                 // in the session store to be retrieved,
                 // or in this case the entire user object
                 req.session.user = user;
-                req.session.success = '用户<a href="/logout">注销</a>. '
-                    + ' 你能够<a href="/restricted">跳往注销界面</a>.';
+                req.session.success = '登录成功.';
                 res.redirect('back');
             });
         } else {
@@ -149,8 +140,8 @@ function register(name,pass,pass1,fn){
     });
 
 }
-// Authenticate using our plain-object database of doom!
 
+// Authenticate using our plain-object database of doom!
 function authenticate(name, pass, fn) {
     if (!module.parent) console.log('authenticating %s:%s', name, pass);
     if (!name || !pass){
