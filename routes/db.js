@@ -10,7 +10,7 @@ var dbPool = new Pool({
 		
         var dbUri = process.env.MONGO_URI || "mongodb://localhost:27017/mydb";
         var db = mongo.db(dbUri, {native_parser:true});
-		console.log('dbUri:', dbUri);
+		//console.log('dbUri:', dbUri);
         // parameter order: err, resource
         callback(null, db);
     },
